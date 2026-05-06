@@ -1,5 +1,7 @@
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
+import java.awt.geom.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,77 +12,135 @@ public class Frame extends JFrame {
     JTextField usernameField;
     JTextField gmailField;
     JPasswordField passwordField;
-    JLabel label_img, label_img2, label_img3, label, label2, label3;
-    ImageIcon user, mail, pass;
+    JCheckBox rememberMe;
+    JLabel forgotPassword;
 
     Frame() {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setLayout(null);
+        this.setLayout(new BorderLayout());
 
-        user = new ImageIcon(getClass().getResource("/user_icon.jpg"));
-        pass = new ImageIcon(getClass().getResource("/pass_icon.jpg"));
-        mail = new ImageIcon(getClass().getResource("/mail_icon.jpg"));
+        // ── LEFT PANEL ──────────────────────────────────────────────
+        JPanel leftPanel = new JPanel();
+        leftPanel.setBackground(new Color(0x2E7D4F));
+        leftPanel.setPreferredSize(new Dimension(220, 420));
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(40, 20, 30, 20));
 
-        label_img = new JLabel();
-        label_img2 = new JLabel();
-        label_img3 = new JLabel();
-        label_img.setIcon(user);
-        label_img2.setIcon(mail);
-        label_img3.setIcon(pass);
+        // Logo placeholder (replace with your actual ImageIcon if needed)
+        JLabel logoLabel = new JLabel();
+        try {
+            ImageIcon raw = new ImageIcon(getClass().getResource("/logo.png"));
+            Image scaled = raw.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            logoLabel.setIcon(new ImageIcon(scaled));
+        } catch (Exception ex) {
+            logoLabel.setText("🏫");
+            logoLabel.setFont(new Font("Arial", Font.PLAIN, 60));
+            logoLabel.setForeground(Color.WHITE);
+        }
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        label = new JLabel("Username");
-        label2 = new JLabel("Gmail");
-        label3 = new JLabel("Password");
+        JLabel schoolName = new JLabel(
+                "<html><center>MABAYUAN ELEMENTARY SCHOOL<br>CANTEEN INVENTORY SYSTEM</center></html>");
+        schoolName.setFont(new Font("Arial", Font.BOLD, 13));
+        schoolName.setForeground(Color.WHITE);
+        schoolName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        schoolName.setHorizontalAlignment(JLabel.CENTER);
+
+        leftPanel.add(Box.createVerticalGlue());
+        leftPanel.add(logoLabel);
+        leftPanel.add(Box.createVerticalStrut(20));
+        leftPanel.add(schoolName);
+        leftPanel.add(Box.createVerticalGlue());
+
+        // ── RIGHT PANEL ─────────────────────────────────────────────
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(new Color(0xF2F2F2));
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(30, 35, 30, 35));
+
+        // Title bar
+        JPanel titleBar = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titleBar.setBackground(new Color(0x2E7D4F));
+        titleBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        JLabel titleLabel = new JLabel("🔒  SYSTEM LOGIN");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setForeground(Color.WHITE);
+        titleBar.add(titleLabel);
+        titleBar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Username
+        JLabel userLabel = new JLabel("USERNAME");
+        styleFormLabel(userLabel);
 
         usernameField = new JTextField();
+        styleField(usernameField, "👤  ENTER YOUR USERNAME");
+
+        // Email
+        JLabel emailLabel = new JLabel("EMAIL");
+        styleFormLabel(emailLabel);
+
         gmailField = new JTextField();
+        styleField(gmailField, "✉  ENTER YOUR EMAIL");
+
+        // Password
+        JLabel passLabel = new JLabel("PASSWORD");
+        styleFormLabel(passLabel);
+
         passwordField = new JPasswordField();
+        styleField(passwordField, "🔑  ENTER YOUR PASSWORD");
 
-        loginButton = new JButton("Login");
+        // Remember Me + Forgot Password row
+        JPanel rememberRow = new JPanel(new BorderLayout());
+        rememberRow.setBackground(new Color(0xF2F2F2));
+        rememberRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        this.add(label_img);
-        this.add(label_img2);
-        this.add(label_img3);
-        this.add(label);
-        this.add(label2);
-        this.add(label3);
-        this.add(usernameField);
-        this.add(gmailField);
-        this.add(passwordField);
-        this.add(loginButton);
+        rememberMe = new JCheckBox("REMEMBER ME");
+        rememberMe.setBackground(new Color(0xF2F2F2));
+        rememberMe.setFont(new Font("Arial", Font.PLAIN, 11));
+        rememberMe.setFocusable(false);
 
-        loginButton.setBackground(new Color(0xF54927));
+        forgotPassword = new JLabel("FORGOT PASSWORD?");
+        forgotPassword.setFont(new Font("Arial", Font.BOLD, 11));
+        forgotPassword.setForeground(new Color(0x2E7D4F));
+        forgotPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        rememberRow.add(rememberMe, BorderLayout.WEST);
+        rememberRow.add(forgotPassword, BorderLayout.EAST);
+
+        // Login Button
+        loginButton = new JButton("➜  LOG IN");
+        loginButton.setBackground(new Color(0x2E7D4F));
         loginButton.setForeground(Color.WHITE);
         loginButton.setFont(new Font("Arial", Font.BOLD, 15));
         loginButton.setFocusable(false);
+        loginButton.setBorderPainted(false);
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        loginButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        for (JLabel lbl : new JLabel[] { label, label2, label3 }) {
-            lbl.setBackground(new Color(0xF54927));
-            lbl.setForeground(Color.WHITE);
-            lbl.setFont(new Font("Arial", Font.BOLD, 15));
-            lbl.setOpaque(true);
-            lbl.setHorizontalAlignment(JLabel.CENTER);
-        }
+        // Assemble right panel
+        rightPanel.add(titleBar);
+        rightPanel.add(Box.createVerticalStrut(20));
+        rightPanel.add(userLabel);
+        rightPanel.add(Box.createVerticalStrut(5));
+        rightPanel.add(usernameField);
+        rightPanel.add(Box.createVerticalStrut(12));
+        rightPanel.add(emailLabel);
+        rightPanel.add(Box.createVerticalStrut(5));
+        rightPanel.add(gmailField);
+        rightPanel.add(Box.createVerticalStrut(12));
+        rightPanel.add(passLabel);
+        rightPanel.add(Box.createVerticalStrut(5));
+        rightPanel.add(passwordField);
+        rightPanel.add(Box.createVerticalStrut(10));
+        rightPanel.add(rememberRow);
+        rightPanel.add(Box.createVerticalStrut(15));
+        rightPanel.add(loginButton);
 
-        for (JTextField field : new JTextField[] { usernameField, gmailField, passwordField }) {
-            field.setFont(new Font("Arial", Font.PLAIN, 14));
-        }
+        this.add(leftPanel, BorderLayout.WEST);
+        this.add(rightPanel, BorderLayout.CENTER);
 
-        label_img.setBounds(45, 95, 50, 50);
-        label_img2.setBounds(45, 185, 50, 50);
-        label_img3.setBounds(45, 275, 50, 50);
-
-        label.setBounds(100, 60, 150, 32);
-        label2.setBounds(100, 150, 150, 32);
-        label3.setBounds(100, 240, 150, 32);
-
-        usernameField.setBounds(100, 100, 300, 40);
-        gmailField.setBounds(100, 190, 300, 40);
-        passwordField.setBounds(100, 280, 300, 40);
-
-        loginButton.setBounds(175, 350, 100, 35);
-
-        // ACTION LISTENER INSIDE CONSTRUCTOR
+        // ── ACTION LISTENER ─────────────────────────────────────────
         loginButton.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String gmail = gmailField.getText().trim();
@@ -116,5 +176,37 @@ public class Frame extends JFrame {
         });
 
         this.setVisible(true);
+    }
+
+    private void styleFormLabel(JLabel label) {
+        label.setFont(new Font("Arial", Font.BOLD, 11));
+        label.setForeground(Color.DARK_GRAY);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+
+    private void styleField(JTextField field, String placeholder) {
+        field.setFont(new Font("Arial", Font.PLAIN, 13));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(0xCCCCCC), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        field.setForeground(Color.GRAY);
+        field.setText(placeholder);
+        field.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setForeground(Color.GRAY);
+                    field.setText(placeholder);
+                }
+            }
+        });
     }
 }
